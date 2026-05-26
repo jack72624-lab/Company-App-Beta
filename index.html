@@ -325,6 +325,63 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang TC','Micr
 .empty-grid{padding:3rem;text-align:center;color:var(--txt3);grid-column:1/-1;}
 .empty-ic{font-size:32px;margin-bottom:.75rem;}
 
+/* ─ HAMBURGER / MOBILE ─ */
+.hmb{display:none;width:36px;height:36px;border-radius:var(--r);border:1.5px solid var(--bdr);background:#fff;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-left:12px;transition:all .15s;}
+.hmb:hover{border-color:var(--blk);}
+.hmb-ic{display:flex;flex-direction:column;gap:4px;}
+.hmb-ic span{display:block;width:16px;height:1.5px;background:var(--txt);border-radius:2px;transition:all .22s;}
+.hmb.open .hmb-ic span:nth-child(1){transform:translateY(5.5px) rotate(45deg);}
+.hmb.open .hmb-ic span:nth-child(2){opacity:0;transform:scaleX(0);}
+.hmb.open .hmb-ic span:nth-child(3){transform:translateY(-5.5px) rotate(-45deg);}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:35;backdrop-filter:blur(2px);}
+.sb-overlay.on{display:block;}
+
+@media(max-width:768px){
+  /* Header */
+  .hmb{display:flex;}
+  .hdr-sb-area{width:auto;border-right:none;padding:0 12px 0 0;}
+  .hdr-search{display:none;}
+  .hdr-sp{display:none;}
+  .ai-btn span,.ai-btn-txt{display:none;}
+  .ai-btn{padding:6px 10px;margin-right:6px;}
+  .unm,.rbadge{display:none;}
+  .uchip{padding:5px;margin-right:8px;}
+
+  /* Sidebar: slide-in overlay */
+  .sb{position:fixed;left:0;top:52px;bottom:0;z-index:40;transform:translateX(-100%);transition:transform .22s cubic-bezier(.4,0,.2,1);width:240px;box-shadow:4px 0 24px rgba(0,0,0,.18);}
+  .sb.mob-open{transform:translateX(0);}
+
+  /* Main full width */
+  .abody{position:relative;}
+  .main{width:100%;}
+
+  /* Card grid: 1 col on very small, 2 col on medium phone */
+  .card-grid{grid-template-columns:1fr;padding:1rem;gap:12px;}
+  .prod-grid{grid-template-columns:1fr 1fr;gap:12px;}
+  .pview{padding:1rem;}
+  .pview-fbar{overflow-x:auto;flex-wrap:nowrap;padding-bottom:.5rem;}
+  .fpill{white-space:nowrap;flex-shrink:0;}
+
+  /* Detail panel: full width overlay */
+  .det{position:fixed;left:0;right:0;top:52px;bottom:0;width:100%!important;z-index:30;border-left:none;border-top:1.5px solid var(--bdr);}
+
+  /* AI drawer */
+  .aid{width:100%;top:52px;}
+
+  /* Login */
+  .l-left{display:none;}
+  .l-right{padding:1.5rem;}
+
+  /* Intel / Audit / Users */
+  .iview,.aview,.uview{padding:1rem;}
+  .utable{display:block;overflow-x:auto;}
+
+  /* Page header */
+  .page-hdr{padding:1rem 1rem 0;flex-wrap:wrap;gap:10px;}
+  .fbar{padding:.75rem 1rem;overflow-x:auto;flex-wrap:nowrap;}
+  .fbar .fpill{flex-shrink:0;}
+}
+
 /* ─ PRODUCT CATALOG ─ */
 .pview{padding:1.75rem;}
 .pview-hdr{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:.875rem;}
@@ -401,6 +458,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang TC','Micr
 <!-- APP -->
 <div id="app">
   <div class="hdr">
+    <button class="hmb" id="hmb" onclick="toggleSidebar()" aria-label="選單">
+      <div class="hmb-ic"><span></span><span></span><span></span></div>
+    </button>
     <div class="hdr-sb-area">
       <div class="hdr-ic">📱</div>
       <div><div class="hdr-name">DeviceBase</div><div class="hdr-ver">Knowledge System</div></div>
@@ -420,8 +480,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang TC','Micr
     </div>
   </div>
 
+  <div class="sb-overlay" id="sb-ov" onclick="closeSidebar()"></div>
   <div class="abody">
-    <div class="sb">
+    <div class="sb" id="sb">
       <div class="sb-sec">知識庫</div>
       <div class="sbi on" onclick="fcat('all',this)"><div class="sbi-l"><span class="sbi-ic">▤</span>全部文章</div><span class="sbcnt" id="c-all">8</span></div>
       <div class="sbi" onclick="fcat('門禁系統',this)"><div class="sbi-l"><span class="sbi-ic">🔐</span>門禁系統</div><span class="sbcnt" id="c-門禁系統">3</span></div>
@@ -572,6 +633,19 @@ function tbadge(t){const m={安裝步驟:'i',常見問題:'f',設備原理:'p',�
 function toast(msg){const el=document.getElementById('toast-el');el.textContent=msg;el.classList.add('on');setTimeout(()=>el.classList.remove('on'),2500);}
 function toggleDD(){document.getElementById('dd').classList.toggle('open');}
 document.addEventListener('click',e=>{if(!e.target.closest('.uchip'))document.getElementById('dd').classList.remove('open');});
+
+// ─ MOBILE SIDEBAR ─
+function toggleSidebar(){
+  const sb=document.getElementById('sb'),ov=document.getElementById('sb-ov'),hmb=document.getElementById('hmb');
+  const isOpen=sb.classList.contains('mob-open');
+  if(isOpen){sb.classList.remove('mob-open');ov.classList.remove('on');hmb.classList.remove('open');}
+  else{sb.classList.add('mob-open');ov.classList.add('on');hmb.classList.add('open');}
+}
+function closeSidebar(){
+  document.getElementById('sb').classList.remove('mob-open');
+  document.getElementById('sb-ov').classList.remove('on');
+  document.getElementById('hmb').classList.remove('open');
+}
 function closeMo(id){document.getElementById(id).classList.remove('open');}
 function hl(t){if(!S.q)return t;const re=new RegExp(`(${S.q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');return t.replace(re,'<mark style="background:#fef08a;border-radius:2px;padding:0 1px">$1</mark>');}
 
@@ -588,7 +662,7 @@ function logout(){document.getElementById('app').classList.remove('on');document
 function fcat(cat,el){
   S.cat=cat;S.selId=null;document.querySelectorAll('.sbi').forEach(e=>e.classList.remove('on'));el.classList.add('on');
   document.getElementById('vt').textContent=cat==='all'?'全部文章':cat;
-  showView('lv');document.getElementById('det').classList.remove('open');renderCards();
+  showView('lv');document.getElementById('det').classList.remove('open');renderCards();closeSidebar();
 }
 function ftype(type,el){S.type=type;document.querySelectorAll('.fpill').forEach(e=>e.classList.remove('on'));el.classList.add('on');renderCards();}
 function search(q){S.q=q.trim().toLowerCase();renderCards();}
@@ -668,7 +742,7 @@ function showView(id){['lv','prodv','intv','auv','usv'].forEach(v=>document.getE
 
 function showAudit(){
   document.querySelectorAll('.sbi').forEach(e=>e.classList.remove('on'));event.currentTarget.classList.add('on');
-  showView('auv');document.getElementById('det').classList.remove('open');
+  showView('auv');document.getElementById('det').classList.remove('open');closeSidebar();
   document.getElementById('auv').innerHTML=`<div class="aview"><h2>修改記錄</h2><div class="aview-sub">所有文章的新增、修改與刪除操作記錄。</div>
   <div class="alog">${logs.map(l=>`<div class="aitem">
     <div class="adot ${l.tp}"></div>
@@ -682,7 +756,7 @@ function showAudit(){
 }
 function showUsers(){
   document.querySelectorAll('.sbi').forEach(e=>e.classList.remove('on'));event.currentTarget.classList.add('on');
-  showView('usv');document.getElementById('det').classList.remove('open');renderUsers();
+  showView('usv');document.getElementById('det').classList.remove('open');renderUsers();closeSidebar();
 }
 function renderUsers(){
   document.getElementById('usv').innerHTML=`<div class="uview"><h2>使用者管理</h2><div class="uview-sub">管理可存取此系統的 Google 帳號白名單與角色。</div>
@@ -708,7 +782,7 @@ function addUser(){const nm=document.getElementById('nu-nm').value.trim(),em=doc
 const sevLbl={urg:'緊急',imp:'重要',ref:'參考'};
 function showIntel(){
   document.querySelectorAll('.sbi').forEach(e=>e.classList.remove('on'));event.currentTarget.classList.add('on');
-  showView('intv');document.getElementById('det').classList.remove('open');renderIntel();
+  showView('intv');document.getElementById('det').classList.remove('open');renderIntel();closeSidebar();
 }
 function renderIntel(){
   const active=intel.filter(x=>!x.dismissed);
@@ -812,7 +886,7 @@ const S2={prodCat:'all'};
 function showProds(el){
   document.querySelectorAll('.sbi').forEach(e=>e.classList.remove('on'));
   if(el)el.classList.add('on');
-  showView('prodv');document.getElementById('det').classList.remove('open');renderProds();
+  showView('prodv');document.getElementById('det').classList.remove('open');renderProds();closeSidebar();
 }
 function renderProds(){
   const cat=S2.prodCat;
